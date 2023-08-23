@@ -56,15 +56,17 @@
                         <i class="fa-solid fa-subtract"></i>
                     </div>
 
-                    <div class="btn btn-volume">
+                    <!-- <div class="btn btn-volume">
                         <i class="fa-solid fa-volume-high "></i>
-                    </div>
+                    </div> -->
+
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0">
+
                     <div class="btn btn-up-volume">
                         <i class="fa-solid fa-plus"></i>
                     </div>
                 </div>
 
-                <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0">
                 <!-- <span class="volume-value">50%</span> -->
 
             </div>
@@ -116,8 +118,11 @@
 
         const playlist = $('.playlist')
 
+        const upVolumeBtn = $('.btn-up-volume')
+        const downVolumeBtn = $('.btn-down-volume')
+        const volumeSlider = $('#volume-slider')
+
         const app = {
-            currentIndex: 0,
             isPlaying: false,
             isRandom: false,
             isRepeat: false,
@@ -193,6 +198,7 @@
                 })
 
                 playlist.innerHTML = htmls.join('')
+                this.setConfig("currentIndex", this.currentIndex)
             },
 
             defineProperties: function(){
@@ -306,6 +312,7 @@
                     } else {
                         nextBtn.click()
                     }
+                    _this.setConfig("currentIndex", _this.currentIndex)
                 }
                 
                 //Lang nghe hanh vi click vao playlist
@@ -332,6 +339,35 @@
                     }
                 }
 
+                // Xu ly tang/ giam am luong
+                downVolumeBtn.onclick = function(){
+                    if(audio.volume > 0){
+                        audio.volume = parseFloat((audio.volume - 0.1).toFixed(1));
+                        volumeSlider.value = audio.volume;
+                        _this.setConfig('currentVolume', volumeSlider.value)
+                    }
+                }
+
+                upVolumeBtn.onclick = function(){
+                    if(audio.volume < 1) {
+                        audio.volume = parseFloat((audio.volume + 0.1).toFixed(1));
+                        volumeSlider.value = audio.volume;
+                        _this.setConfig('currentVolume', volumeSlider.value)
+                    }
+                }
+                
+                // Cap nhat gia tri cua volume slider khi volume thay doi
+                audio.onvolumechange = function(){
+                    audio.value = audio.volume
+                }
+
+                //Cap nhat gia tri khi slice thanh audio 
+                volumeSlider.oninput = function(){
+                    var audioPercent = volumeSlider.value
+                    audio.volume = audioPercent
+                    _this.setConfig('currentVolume', volumeSlider.value)
+                }
+
             },
 
             scrollToActiveSong(){
@@ -356,22 +392,34 @@
                 }
                 this.currentIndex = newIndex
                 this.loadCurrentSong()
-                console.log(this.playIndexes)
             },
 
             loadCurrentSong: function(){
                 heading.textContent = this.currentSong.name
                 cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`
                 audio.src = this.currentSong.path
-                this.setConfig("currentIndex", this.currentIndex)
+                
             },
             
             loadConfig: function(){
                 this.isRandom = this.config.isRandom
                 this.isRepeat = this.config.isRepeat
-                this.currentIndex = this.config.currentIndex
-                this.playIndexes.push(this.config.currentIndex)
-                 //Object.assign(this, this.config)
+
+                if(this.config.currentIndex === undefined){
+                    this.currentIndex = 0
+                } else {
+                    this.currentIndex = this.config.currentIndex
+                }
+                if(this.config.currentVolume === undefined){
+                    volumeSlider.value = 0.5
+                    audio.volume = 0.5
+                } else {
+                    volumeSlider.value = this.config.currentVolume
+                    audio.volume = this.config.currentVolume
+                }
+
+                
+                //  //Object.assign(this, this.config)
             },
 
             nextSong: function(){

@@ -135,18 +135,22 @@
   
   .container {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    padding: 0 100px;
+
   }
 
   .volume-slider {
     margin: auto;
     display: block;
-    width: 216px;
+    max-width: 70%;
+    flex-grow: 1;
+    margin: 0;
   }
 
   /* PLAYLIST */
   .playlist {
-    margin-top: 408px;
+    margin-top: 426px;
     padding: 12px;
     background-color: #ebebeb;
   }
