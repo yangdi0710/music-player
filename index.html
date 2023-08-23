@@ -105,6 +105,7 @@
             isPlaying: false,
             isRandom: false,
             isRepeat: false,
+            playIndexes: [],
             config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
             songs: [
             {
@@ -239,7 +240,7 @@
                 }
 
                 //Xử lý khi tua bài hát
-                progress.onchange = function(){
+                progress.oninput = function(){
                     const seekTime = progress.value / 100 * audio.duration
                     audio.currentTime = seekTime
                 }
@@ -309,7 +310,7 @@
 
                         //Xu ly khi click vao option
                         if(e.target.closest('.option')){
-
+                            
                         }
 
                     }
@@ -321,7 +322,7 @@
                 setTimeout(() => {
                     $('.song.active').scrollIntoView({
                         behavior:'smooth',
-                        block: 'nearest'
+                        block: 'center'
                     });
                 }, 300)
             },
@@ -330,20 +331,31 @@
                 let newIndex = this.currentIndex;
                 do {
                     newIndex = Math.floor(Math.random() * this.songs.length)
-                } while (newIndex === this.currentIndex);
+                } while (this.playIndexes.includes(newIndex));
+
+                this.playIndexes.push(newIndex)
+
+                if(this.playIndexes.length === this.songs.length){
+                    this.playIndexes = []
+                }
                 this.currentIndex = newIndex
                 this.loadCurrentSong()
+                console.log(this.playIndexes)
             },
 
             loadCurrentSong: function(){
                 heading.textContent = this.currentSong.name
                 cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`
                 audio.src = this.currentSong.path
+                this.setConfig("currentIndex", this.currentIndex)
             },
             
             loadConfig: function(){
                 this.isRandom = this.config.isRandom
                 this.isRepeat = this.config.isRepeat
+                this.currentIndex = this.config.currentIndex
+                this.playIndexes.push(this.config.currentIndex)
+                 //Object.assign(this, this.config)
             },
 
             nextSong: function(){
