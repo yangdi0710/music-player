@@ -133,6 +133,17 @@
     cursor: pointer;
   }
   
+  .container {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  .volume-slider {
+    margin: auto;
+    display: block;
+    width: 216px;
+  }
+
   /* PLAYLIST */
   .playlist {
     margin-top: 408px;
